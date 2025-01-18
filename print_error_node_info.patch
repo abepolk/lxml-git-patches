@@ -1,20 +1,17 @@
 diff --git a/src/lxml/includes/debugxml.pxd b/src/lxml/includes/debugxml.pxd
 new file mode 100644
-index 00000000..6715f1b6
+index 00000000..5d535444
 --- /dev/null
 +++ b/src/lxml/includes/debugxml.pxd
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,6 @@
 +from lxml.includes.tree cimport xmlDoc, xmlNode, xmlAttr
 +from libc.stdio cimport FILE
 +
 +cdef extern from "libxml/debugXML.h" nogil:
 +
-+    cdef void xmlDebugDumpDocument(FILE *output, xmlDoc* doc)
-+    cdef void xmlDebugDumpNode(FILE *output, xmlNode* node, int depth)
-+    cdef void xmlDebugDumpAttrList(FILE *output, xmlAttr* attr, int depth)
 +    cdef void xmlDebugDumpOneNode(FILE *output, xmlNode* node, int depth)
 diff --git a/src/lxml/parser.pxi b/src/lxml/parser.pxi
-index 70337d87..024081e7 100644
+index 70337d87..e14ec45e 100644
 --- a/src/lxml/parser.pxi
 +++ b/src/lxml/parser.pxi
 @@ -3,6 +3,9 @@
@@ -27,23 +24,19 @@ index 70337d87..024081e7 100644
  
  class ParseError(LxmlSyntaxError):
      """Syntax error while parsing an XML document.
-@@ -642,6 +645,21 @@ cdef _initParserContext(_ParserContext context,
+@@ -642,6 +645,17 @@ cdef _initParserContext(_ParserContext context,
          context._initParserContext(c_ctxt)
  
  cdef void _forwardParserError(xmlparser.xmlParserCtxt* _parser_context, const xmlerror.xmlError* error) noexcept with gil:
 +    # Start of inserted code
 +    cdef xmlNode* debugNode
-+    printf("lxml: printing xmlDebugDumpOneNode with indentation of 30\n")
++    printf("lxml: printing xmlDebugDumpOneNode with indentation of 100\n")
 +    debugxml.xmlDebugDumpOneNode(stdout, _parser_context.node, 100)
 +    printf("lxml: printing xmlDebugDumpOneNode for all children, same indent\n")
 +    debugNode = _parser_context.node.children
-+    printf("a\n")
 +    while debugNode is not NULL:
-+        printf("b\n")
 +        debugxml.xmlDebugDumpOneNode(stdout, debugNode, 100)
-+        printf("c\n")
 +        debugNode = debugNode.next
-+        printf("d\n")
 +    # End of inserted code
 +
      (<_ParserContext>_parser_context._private)._error_log._receive(error)
