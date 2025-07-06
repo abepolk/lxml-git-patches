@@ -11,23 +11,24 @@ index 00000000..5d535444
 +
 +    cdef void xmlDebugDumpOneNode(FILE *output, xmlNode* node, int depth)
 diff --git a/src/lxml/parser.pxi b/src/lxml/parser.pxi
-index 70337d87..e14ec45e 100644
+index dc3629bb..b68c41af 100644
 --- a/src/lxml/parser.pxi
 +++ b/src/lxml/parser.pxi
-@@ -3,6 +3,9 @@
+@@ -3,6 +3,10 @@
  from lxml.includes cimport xmlparser
  from lxml.includes cimport htmlparser
  
 +from libc.stdio cimport printf, stdout
 +
 +from lxml.includes cimport debugxml
- 
- class ParseError(LxmlSyntaxError):
-     """Syntax error while parsing an XML document.
-@@ -642,6 +645,17 @@ cdef _initParserContext(_ParserContext context,
-         context._initParserContext(c_ctxt)
- 
- cdef void _forwardParserError(xmlparser.xmlParserCtxt* _parser_context, const xmlerror.xmlError* error) noexcept with gil:
++
+ cdef object _GenericAlias
+ try:
+     from types import GenericAlias as _GenericAlias
+@@ -657,6 +661,17 @@ cdef void _forwardParserError(xmlparser.xmlParserCtxt* _parser_context, const xm
+     """
+     Add an error created by libxml2 to the lxml-level error_log.
+     """
 +    # Start of inserted code
 +    cdef xmlNode* debugNode
 +    printf("lxml: printing xmlDebugDumpOneNode with indentation of 100\n")
